@@ -1,0 +1,205 @@
+# Configuration centrale du simulateur Villepin 2027
+# Tout est ici pour éviter les magic numbers dans le code.
+# Modifier config.yaml > recharger > rejouer (reproductibilité).
+
+seed: 42
+
+# ------------------------------------------------------------------
+# Pools électoraux pour la cible 2027 : calibrés sur sondages IFOP /
+# Sud Radio / Public Sénat / Wikipédia "Liste de sondages 2027" entre
+# février et mai 2026. Mise à jour mai 2026.
+# Sources :
+# - Bardella 34-38% (RN), Le Pen 32-33% (RN alt) → pool rn ≈ 36%
+# - Philippe 16-19% + Attal 11-14% + Darmanin 8% + Lecornu 6%
+#   → bloc central élargi ≈ 30% (Horizons + Renaissance + LREM divers)
+# - Mélenchon 10-12% (LFI) + reliquat PCF/NPA/LO → pool lfi ≈ 14%
+# - Glucksmann 10-12% (PS) + Verts → pool gauche ≈ 13%
+# - Retailleau 9.5-10% (LR confirmé candidat par adhérents avril 2026)
+# - Indécis très faibles dans les sondages (1-3%)
+# Total ≈ 105 : Bardella et Le Pen sont alternatifs, Attal/Philippe se
+# disputent le pool central. On garde un total proche de 100.
+# ------------------------------------------------------------------
+pools:
+  rn:       {size: 36.0, inertia: 0.85}   # bloc RN/Reconquête (34-38% sondages)
+  central:  {size: 28.0, inertia: 0.45}   # Philippe + Attal + Darmanin + Lecornu
+  gauche:   {size: 12.0, inertia: 0.55}   # Glucksmann + Verts (PS effondré)
+  lfi:      {size: 14.0, inertia: 0.70}   # Mélenchon + PCF + NPA + LO
+  lr:       {size:  8.0, inertia: 0.60}   # Retailleau (LR conserve son socle)
+  indecis:  {size:  2.0, inertia: 0.15}   # très peu d'indécis selon sondages
+
+# ------------------------------------------------------------------
+# Affinités candidat -> pool. Valeurs dans [-1, 1].
+# Historique des révisions :
+# - v0 : trop optimiste (gauche:+0.4, lfi:+0.1, indecis:+0.7).
+# - v1 : sobre (rn:-0.7, central:+0.4, gauche:-0.05, lfi:-0.30, lr:+0.45, indecis:+0.30).
+# - v2 (mai 2026, après recherche déclarations publiques DDV) :
+#   Villepin se positionne explicitement en "candidat de rassemblement",
+#   refuse la primaire de droite (cf interview ICI Caen + France3 Régions),
+#   parle à la gauche modérée (héritage anti-Irak, gaullisme social).
+#   51% bonne opinion (sondage 2026), 11% intentions de vote déclarées.
+#   Ajustements modestes et JUSTIFIÉS (pas hagiographique) :
+# - gauche : -0.05 → +0.10 (anti-Irak, "rassemblement national",
+#   appréciation chez ex-PS Iraq-sensibles ; reste faible car libéral).
+# - lr : +0.45 → +0.50 (terreau gaulliste-chiraquien, son socle naturel).
+# - indecis : +0.30 → +0.40 (positionnement "ni gauche-ni droite" déclaré).
+# - rn / central / lfi : inchangés (pas de signal nouveau).
+# ------------------------------------------------------------------
+villepin_affinity:
+  rn: -0.70
+  central: 0.40
+  gauche: 0.10
+  lfi: -0.30
+  lr: 0.50
+  indecis: 0.40
+
+# Bases concurrents : mise à jour mai 2026 (sondages IFOP / Sud Radio / Public Sénat).
+# Sources spécifiques :
+# - Bardella 34-38% (IFOP mars+mai 2026, Le Figaro) → 36
+# - Philippe 16-19% (IFOP mars 2026 à 16, sondage Wikipédia mai 2026 à 19) → 18
+#   Note : Attal 11-14% est implicitement absorbé dans pool central
+#   (ses voix vont vers d'autres centristes si Philippe est seul candidat).
+# - Mélenchon 10-12% (IFOP fév-mai 2026) → 11
+# - Retailleau 9.5-10% (TF1, Sud Radio post-vote LR avril 2026) → 10
+# - Glucksmann 10-12% (IFOP, Public Sénat) → 11
+competitors:
+  bardella:
+    base: 36.0
+    affinity:  {rn:  0.95, central: -0.40, gauche: -0.70, lfi: -0.80, lr:  0.30, indecis: 0.10}
+  philippe:
+    base: 18.0
+    affinity:  {rn: -0.30, central:  0.85, gauche:  0.20, lfi: -0.50, lr:  0.50, indecis: 0.40}
+  melenchon:
+    base: 11.0
+    affinity:  {rn: -0.80, central: -0.50, gauche:  0.40, lfi:  0.90, lr: -0.70, indecis: 0.00}
+  retailleau:
+    base: 10.0
+    affinity:  {rn:  0.20, central:  0.00, gauche: -0.40, lfi: -0.70, lr:  0.85, indecis: 0.10}
+  glucksmann:
+    base: 11.0
+    affinity:  {rn: -0.50, central:  0.30, gauche:  0.75, lfi:  0.10, lr: -0.20, indecis: 0.20}
+
+# ------------------------------------------------------------------
+# Modèle de masse Villepin : formule additive + sigmoïde.
+# m = m_min + (m_max - m_min) * sigmoid( Σ wi * (xi - 0.5) + bias )
+# Pas d'optimum trivial : la sigmoïde sature, doubler xi ne double pas m.
+# Les poids wi sont calibrés sur données historiques (cf calibration.py).
+# Valeurs ici = priors avant fit.
+# ------------------------------------------------------------------
+mass_model:
+  m_min: 0.3       # masse plancher (Villepin a une marque)
+  m_max: 3.0       # masse plafond (avant capture concurrentielle)
+  bias: -1.0       # neutre clairement bas (Villepin part en outsider)
+  # Poids des 8 paramètres Tier 1. Recalibrés par ridge sur historique.
+  weights:
+    crisis: 1.5             # exogène
+    central_collapse: 1.2   # exogène
+    volatility: 0.4         # exogène (modulateur secondaire)
+    anti_extreme_pressure: 1.4  # exogène
+    campaign_machine: 1.0       # interne
+    thematic_breadth: 0.8       # interne
+    media_performance: 1.1      # interne
+    coalition_building: 0.9     # interne
+
+# ------------------------------------------------------------------
+# Capture concurrentielle (Bradley-Terry-like) et flux
+# ------------------------------------------------------------------
+capture:
+  villepin_scale: 4.0   # facteur d'échelle gravitationnelle Villepin
+  volatility_softening: 0.6   # softening de l'inertie par volatility (∈[0,1])
+  # effective_mobility = (1 - inertia) + softening * volatility * inertia
+
+# ------------------------------------------------------------------
+# Effondrement central -> redistribution vers indécis
+# ------------------------------------------------------------------
+central_collapse:
+  transfer_ratio: 0.55
+
+# ------------------------------------------------------------------
+# Plafonds de score 1T (réalisme)
+# ------------------------------------------------------------------
+score_caps:
+  min: 0.5
+  max: 38.0
+
+# ------------------------------------------------------------------
+# Second tour : boost report (front républicain conditionnel)
+# ------------------------------------------------------------------
+second_round:
+  # report = base + slope * anti_extreme_pressure, clippé dans [0, 0.95]
+  # Camp RN -> fort front républicain. LFI -> moyen. Centre/LR -> faible.
+  report_boost:
+    bardella:   {base: 0.50, slope: 0.30}
+    melenchon:  {base: 0.25, slope: 0.15}
+    philippe:   {base: 0.05, slope: 0.05}
+    retailleau: {base: 0.10, slope: 0.05}
+    glucksmann: {base: 0.05, slope: 0.05}
+    default:    {base: 0.10, slope: 0.00}
+  sigmoid_scale: 5.0
+  boost_to_score: 30.0   # le boost (0-1) est converti en équivalent-points
+
+# ------------------------------------------------------------------
+# Contraintes réalistes pour l'optimisation
+# ------------------------------------------------------------------
+constraints:
+  coalition_needs_machine:
+    threshold_machine: 0.5
+    cap_coalition_if_below: 0.6
+  thematic_needs_machine:
+    threshold_machine: 0.3
+    cap_thematic_if_below: 0.4
+  budget_internal:
+    params: [campaign_machine, thematic_breadth, media_performance, coalition_building]
+    max_sum: 3.0
+  exogenous_params:   # exclus de l'optimisation interne (la campagne ne les contrôle pas)
+    - crisis
+    - central_collapse
+    - volatility
+    - anti_extreme_pressure
+
+# ------------------------------------------------------------------
+# Pipeline
+# ------------------------------------------------------------------
+pipeline:
+  # v3 : RATIONAL OPTIMAL (rééquilibrage compute / précision).
+  # Justifications :
+  # - LHS 30k × 30 MC = 900k sim, déjà précis (MAE NN observé < 0.5 en v2).
+  # - NN 192×3 résiduel = ~270k params, suffisant pour 8-13D input.
+  # - CMA-ES 100×500×20 = 1M évals = couverture suffisante pour 8D bornée.
+  # Budget total < 10 min wall sur 16 cores.
+  monte_carlo:
+    n_samples_full: 30000
+    n_samples_quick: 4000
+    n_mc_per_sample: 30
+    noise_std: 0.15
+  neural_network:
+    hidden: 192
+    n_layers: 3
+    dropout: 0.10
+    batch_size: 512
+    lr: 1.5e-3              # un peu plus haut car NN plus petit
+    weight_decay: 5.0e-5
+    max_epochs: 250
+    patience: 15
+    loss_weights: [1.0, 5.0, 20.0]
+  cmaes:
+    sigma0: 0.25
+    popsize: 100
+    maxiter: 500
+    n_restarts: 20
+  clustering:
+    k: 6                    # nombre d'archétypes
+  llm:
+    enabled: true
+    provider: ollama
+    model: "gemma4:31b-cloud"    # validé dispo (Ollama Turbo)
+    max_iterations: 4
+    params_per_iteration: 8
+    early_stop_patience: 2
+    max_total_subparams: 24
+    redundancy_threshold: 0.7    # |corr| < 0.7 sinon rejet
+    importance_to_weight: 0.06   # weight_sp = importance/10 * importance_to_weight
+                                  # 0.06 plafonne l'effet d'un sub-param
+
+# Sous-paramètres Tier 2 : initialement vide, rempli par la boucle LLM
+# Format : nom -> {parent: str(Tier 1), description: str, weight: float}
+tier2_params: {}

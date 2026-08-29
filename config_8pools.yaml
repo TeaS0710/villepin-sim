@@ -1,0 +1,212 @@
+# Configuration alternative : 8 pools sociologiques au lieu de 6.
+# Hypothèse testée : séparer RN classique / extreme_droite (Reconquête,
+# Zemmour) et LFI / extreme_gauche (NPA, LO) offload les pools mainstream
+# et ouvre potentiellement de l'espace pour Villepin en attirant les transfuges.
+
+seed: 42
+
+# ------------------------------------------------------------------
+# 8 pools (au lieu de 6). Redistribution des sondages mai 2026 :
+# - RN 36 : 29 (RN classique Bardella/Le Pen) + 7 (extreme_droite Reconquête)
+# - LFI 14 : 9 (LFI Mélenchon) + 3 (extreme_gauche NPA/LO/PCF) + 2 vers indecis
+# - Indécis passe de 2 à 5 pour absorber le bruit des sondages
+# ------------------------------------------------------------------
+pools:
+  rn:               {size: 29.0, inertia: 0.85}   # bloc RN classique (Bardella/Le Pen)
+  extreme_droite:   {size:  7.0, inertia: 0.78}   # Reconquête, MNR, MPF résiduel
+  central:          {size: 28.0, inertia: 0.45}   # Philippe + Attal + Darmanin
+  gauche:           {size: 11.0, inertia: 0.55}   # Glucksmann + Verts
+  lfi:              {size:  9.0, inertia: 0.70}   # Mélenchon LFI core
+  extreme_gauche:   {size:  3.0, inertia: 0.65}   # NPA Poutou + LO Arthaud + PCF
+  lr:               {size:  8.0, inertia: 0.60}   # Retailleau
+  indecis:          {size:  5.0, inertia: 0.15}   # vraiment indécis + bruit
+
+# ------------------------------------------------------------------
+# Affinités Villepin sur 8 pools (étendues depuis v2).
+# Logique : extrêmes plus opposés que les modérés correspondants
+# (gaulliste-chiraquien n'attire ni Zemmour ni Poutou).
+# ------------------------------------------------------------------
+villepin_affinity:
+  rn:             -0.70
+  extreme_droite: -0.85   # plus opposé que RN classique
+  central:         0.40
+  gauche:          0.10
+  lfi:            -0.30
+  extreme_gauche: -0.40   # plus opposé que LFI
+  lr:              0.50
+  indecis:         0.40
+
+# ------------------------------------------------------------------
+# Compétiteurs : ajout zemmour (extreme_droite) et poutou (extreme_gauche).
+# Toutes les affinités sont étendues aux 8 pools.
+# ------------------------------------------------------------------
+competitors:
+  bardella:
+    base: 29.0
+    affinity:
+      rn:              0.95
+      extreme_droite:  0.50   # capte un peu de Reconquête en débauchage
+      central:        -0.40
+      gauche:         -0.70
+      lfi:            -0.80
+      extreme_gauche: -0.95
+      lr:              0.30
+      indecis:         0.10
+  zemmour:
+    base: 7.0
+    affinity:
+      rn:              0.60   # cannibalise une partie du RN
+      extreme_droite:  0.95
+      central:        -0.85
+      gauche:         -0.95
+      lfi:            -0.95
+      extreme_gauche: -0.95
+      lr:              0.40   # une partie LR droite-dure
+      indecis:        -0.10
+  philippe:
+    base: 18.0
+    affinity:
+      rn:             -0.30
+      extreme_droite: -0.80
+      central:         0.85
+      gauche:          0.20
+      lfi:            -0.50
+      extreme_gauche: -0.80
+      lr:              0.50
+      indecis:         0.40
+  melenchon:
+    base: 9.0
+    affinity:
+      rn:             -0.80
+      extreme_droite: -0.95
+      central:        -0.50
+      gauche:          0.40
+      lfi:             0.90
+      extreme_gauche:  0.30
+      lr:             -0.70
+      indecis:         0.00
+  poutou:
+    base: 3.0
+    affinity:
+      rn:             -0.95
+      extreme_droite: -0.95
+      central:        -0.90
+      gauche:         -0.20
+      lfi:             0.30
+      extreme_gauche:  0.95
+      lr:             -0.95
+      indecis:        -0.20
+  retailleau:
+    base: 10.0
+    affinity:
+      rn:              0.20
+      extreme_droite:  0.30
+      central:         0.00
+      gauche:         -0.40
+      lfi:            -0.70
+      extreme_gauche: -0.85
+      lr:              0.85
+      indecis:         0.10
+  glucksmann:
+    base: 11.0
+    affinity:
+      rn:             -0.50
+      extreme_droite: -0.90
+      central:         0.30
+      gauche:          0.75
+      lfi:             0.10
+      extreme_gauche: -0.10
+      lr:             -0.20
+      indecis:         0.20
+
+mass_model:
+  m_min: 0.3
+  m_max: 3.0
+  bias: -1.0
+  weights:
+    crisis: 1.5
+    central_collapse: 1.2
+    volatility: 0.4
+    anti_extreme_pressure: 1.4
+    campaign_machine: 1.0
+    thematic_breadth: 0.8
+    media_performance: 1.1
+    coalition_building: 0.9
+
+capture:
+  villepin_scale: 4.0
+  volatility_softening: 0.6
+
+central_collapse:
+  transfer_ratio: 0.55
+
+score_caps:
+  min: 0.5
+  max: 38.0
+
+# Second tour : ajout des reports de zemmour (front anti-extrême plus fort)
+# et poutou (incohérent au 2T mais valeur par défaut).
+second_round:
+  report_boost:
+    bardella:   {base: 0.50, slope: 0.30}
+    zemmour:    {base: 0.65, slope: 0.30}
+    melenchon:  {base: 0.25, slope: 0.15}
+    poutou:     {base: 0.30, slope: 0.15}
+    philippe:   {base: 0.05, slope: 0.05}
+    retailleau: {base: 0.10, slope: 0.05}
+    glucksmann: {base: 0.05, slope: 0.05}
+    default:    {base: 0.10, slope: 0.00}
+  sigmoid_scale: 5.0
+  boost_to_score: 30.0
+
+constraints:
+  coalition_needs_machine:
+    threshold_machine: 0.5
+    cap_coalition_if_below: 0.6
+  thematic_needs_machine:
+    threshold_machine: 0.3
+    cap_thematic_if_below: 0.4
+  budget_internal:
+    params: [campaign_machine, thematic_breadth, media_performance, coalition_building]
+    max_sum: 3.0
+  exogenous_params:
+    - crisis
+    - central_collapse
+    - volatility
+    - anti_extreme_pressure
+
+pipeline:
+  monte_carlo:
+    n_samples_full: 30000
+    n_samples_quick: 4000
+    n_mc_per_sample: 30
+    noise_std: 0.15
+  neural_network:
+    hidden: 192
+    n_layers: 3
+    dropout: 0.10
+    batch_size: 512
+    lr: 1.5e-3
+    weight_decay: 5.0e-5
+    max_epochs: 250
+    patience: 15
+    loss_weights: [1.0, 5.0, 20.0]
+  cmaes:
+    sigma0: 0.25
+    popsize: 100
+    maxiter: 500
+    n_restarts: 20
+  clustering:
+    k: 6
+  llm:
+    enabled: false
+    provider: ollama
+    model: "gemma4:31b-cloud"
+    max_iterations: 4
+    params_per_iteration: 8
+    early_stop_patience: 2
+    max_total_subparams: 24
+    redundancy_threshold: 0.7
+    importance_to_weight: 0.06
+
+tier2_params: {}

@@ -1,0 +1,225 @@
+# Configuration multiclasses : 8 pools sociologiques fins.
+# Les NOMS des compétiteurs == NOMS des archétypes historiques (pour cohérence
+# entre simulation 2027 et validation historique 2002-2022).
+#
+# Mapping archétype -> candidat phare 2027 (pour les figures) :
+#   extreme_droite   -> Bardella (RN)
+#   souverainiste    -> (pas de candidat 2027, base 0.1)
+#   droite_classique -> Retailleau (LR)
+#   centre_gouv      -> Philippe (Horizons)
+#   centre_outsider  -> Villepin (modélisé via villepin_affinity)
+#   gauche_socdem    -> Glucksmann (PS / Place publique)
+#   gauche_radicale  -> Mélenchon (LFI)
+#   extreme_gauche   -> Poutou (NPA) / Arthaud (LO)
+#
+# Sondages mai 2026 :
+#   Bardella 36 → 30 (extreme_droite stricto), + 6 absorbés via souverainiste
+#   Retailleau 10 → droite_classique 10
+#   Philippe 18 (+ Attal/Lecornu 8-10 absorbés) → centre_gouv 25
+#   Villepin 11 → centre_outsider 11 (modélisé via villepin_affinity)
+#   Glucksmann 11 → gauche_socdem 11
+#   Mélenchon 11 → gauche_radicale 11
+#   Poutou/Arthaud estimés ~2 → extreme_gauche 2
+
+seed: 42
+
+pools:
+  extreme_droite:    {size: 30.0, inertia: 0.85}
+  souverainiste:     {size:  3.0, inertia: 0.55}
+  droite_classique:  {size: 10.0, inertia: 0.60}
+  centre_gouv:       {size: 25.0, inertia: 0.45}
+  centre_outsider:   {size:  6.0, inertia: 0.45}
+  gauche_socdem:     {size: 13.0, inertia: 0.50}
+  gauche_radicale:   {size:  9.0, inertia: 0.70}
+  extreme_gauche:    {size:  2.0, inertia: 0.75}
+  indecis:           {size:  2.0, inertia: 0.15}
+
+# Villepin = centre_outsider naturel. Affinités sur 8 pools.
+villepin_affinity:
+  extreme_droite:   -0.70
+  souverainiste:    -0.40
+  droite_classique:  0.50
+  centre_gouv:       0.30
+  centre_outsider:   0.85
+  gauche_socdem:     0.10
+  gauche_radicale:  -0.30
+  extreme_gauche:   -0.50
+  indecis:           0.40
+
+# Compétiteurs nommés par leur archétype (pour cohérence historique).
+competitors:
+  extreme_droite:
+    base: 30.0
+    affinity:
+      extreme_droite:    0.95
+      souverainiste:     0.40
+      droite_classique:  0.30
+      centre_gouv:      -0.40
+      centre_outsider:  -0.60
+      gauche_socdem:    -0.70
+      gauche_radicale:  -0.80
+      extreme_gauche:   -0.95
+      indecis:           0.10
+  souverainiste:
+    base: 0.1
+    affinity:
+      extreme_droite:    0.50
+      souverainiste:     0.95
+      droite_classique:  0.30
+      centre_gouv:      -0.50
+      centre_outsider:  -0.40
+      gauche_socdem:    -0.70
+      gauche_radicale:  -0.70
+      extreme_gauche:   -0.80
+      indecis:          -0.10
+  droite_classique:
+    base: 10.0
+    affinity:
+      extreme_droite:    0.20
+      souverainiste:     0.40
+      droite_classique:  0.90
+      centre_gouv:       0.10
+      centre_outsider:   0.00
+      gauche_socdem:    -0.40
+      gauche_radicale:  -0.70
+      extreme_gauche:   -0.85
+      indecis:           0.10
+  centre_gouv:
+    base: 25.0
+    affinity:
+      extreme_droite:   -0.30
+      souverainiste:    -0.20
+      droite_classique:  0.50
+      centre_gouv:       0.90
+      centre_outsider:   0.30
+      gauche_socdem:     0.20
+      gauche_radicale:  -0.50
+      extreme_gauche:   -0.80
+      indecis:           0.40
+  gauche_socdem:
+    base: 11.0
+    affinity:
+      extreme_droite:   -0.50
+      souverainiste:    -0.40
+      droite_classique: -0.20
+      centre_gouv:       0.30
+      centre_outsider:   0.10
+      gauche_socdem:     0.85
+      gauche_radicale:   0.20
+      extreme_gauche:   -0.10
+      indecis:           0.20
+  gauche_radicale:
+    base: 11.0
+    affinity:
+      extreme_droite:   -0.80
+      souverainiste:    -0.60
+      droite_classique: -0.70
+      centre_gouv:      -0.50
+      centre_outsider:  -0.30
+      gauche_socdem:     0.30
+      gauche_radicale:   0.95
+      extreme_gauche:    0.40
+      indecis:           0.00
+  extreme_gauche:
+    base: 2.0
+    affinity:
+      extreme_droite:   -0.95
+      souverainiste:    -0.90
+      droite_classique: -0.95
+      centre_gouv:      -0.90
+      centre_outsider:  -0.70
+      gauche_socdem:    -0.10
+      gauche_radicale:   0.40
+      extreme_gauche:    0.95
+      indecis:          -0.20
+
+mass_model:
+  m_min: 0.3
+  m_max: 3.0
+  bias: -1.0
+  weights:
+    crisis: 1.5
+    central_collapse: 1.2
+    volatility: 0.4
+    anti_extreme_pressure: 1.4
+    campaign_machine: 1.0
+    thematic_breadth: 0.8
+    media_performance: 1.1
+    coalition_building: 0.9
+
+capture:
+  villepin_scale: 4.0
+  volatility_softening: 0.6
+
+central_collapse:
+  transfer_ratio: 0.55
+  source_pool: centre_gouv
+
+score_caps:
+  min: 0.5
+  max: 38.0
+
+second_round:
+  report_boost:
+    extreme_droite:   {base: 0.55, slope: 0.30}
+    souverainiste:    {base: 0.40, slope: 0.20}
+    droite_classique: {base: 0.10, slope: 0.05}
+    centre_gouv:      {base: 0.05, slope: 0.05}
+    gauche_socdem:    {base: 0.05, slope: 0.05}
+    gauche_radicale:  {base: 0.25, slope: 0.15}
+    extreme_gauche:   {base: 0.30, slope: 0.15}
+    default:          {base: 0.10, slope: 0.00}
+  sigmoid_scale: 5.0
+  boost_to_score: 30.0
+
+constraints:
+  coalition_needs_machine:
+    threshold_machine: 0.5
+    cap_coalition_if_below: 0.6
+  thematic_needs_machine:
+    threshold_machine: 0.3
+    cap_thematic_if_below: 0.4
+  budget_internal:
+    params: [campaign_machine, thematic_breadth, media_performance, coalition_building]
+    max_sum: 3.0
+  exogenous_params:
+    - crisis
+    - central_collapse
+    - volatility
+    - anti_extreme_pressure
+
+pipeline:
+  monte_carlo:
+    n_samples_full: 30000
+    n_samples_quick: 4000
+    n_mc_per_sample: 30
+    noise_std: 0.15
+  neural_network:
+    hidden: 192
+    n_layers: 3
+    dropout: 0.10
+    batch_size: 512
+    lr: 1.5e-3
+    weight_decay: 5.0e-5
+    max_epochs: 250
+    patience: 15
+    loss_weights: [1.0, 5.0, 20.0]
+  cmaes:
+    sigma0: 0.25
+    popsize: 100
+    maxiter: 500
+    n_restarts: 20
+  clustering:
+    k: 6
+  llm:
+    enabled: false
+    provider: ollama
+    model: "gemma4:31b-cloud"
+    max_iterations: 4
+    params_per_iteration: 8
+    early_stop_patience: 2
+    max_total_subparams: 24
+    redundancy_threshold: 0.7
+    importance_to_weight: 0.06
+
+tier2_params: {}

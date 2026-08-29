@@ -1,0 +1,17 @@
+{
+  "mae_baseline": 7.090000000000001,
+  "mae_in_sample": 0.97,
+  "mae_loo": 2.054,
+  "archetype_mae": 3.5340000000000003,
+  "archetype_max_delta": 15.07,
+  "sensitivity_coverage_pct": 0.0,
+  "fitted_params": {
+    "mass_bias": 0.9169884600099005,
+    "mass_m_max": 4.33938054468412,
+    "villepin_scale": 5.249084677617855,
+    "volatility_softening": 0.8740092943961189,
+    "second_round_scale": 5.043476406107304,
+    "second_round_boost": 30.00275343864178
+  },
+  "ridge_lambda": 0.1
+}

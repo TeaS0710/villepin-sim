@@ -1,0 +1,172 @@
+seed: 42
+pools:
+  rn:
+    size: 36.0
+    inertia: 0.85
+  central:
+    size: 28.0
+    inertia: 0.45
+  gauche:
+    size: 12.0
+    inertia: 0.55
+  lfi:
+    size: 14.0
+    inertia: 0.7
+  lr:
+    size: 8.0
+    inertia: 0.6
+  indecis:
+    size: 2.0
+    inertia: 0.15
+villepin_affinity:
+  rn: -0.7
+  central: 0.4
+  gauche: 0.1
+  lfi: -0.3
+  lr: 0.5
+  indecis: 0.4
+competitors:
+  bardella:
+    base: 36.0
+    affinity:
+      rn: 0.95
+      central: -0.4
+      gauche: -0.7
+      lfi: -0.8
+      lr: 0.3
+      indecis: 0.1
+  philippe:
+    base: 18.0
+    affinity:
+      rn: -0.3
+      central: 0.85
+      gauche: 0.2
+      lfi: -0.5
+      lr: 0.5
+      indecis: 0.4
+  melenchon:
+    base: 11.0
+    affinity:
+      rn: -0.8
+      central: -0.5
+      gauche: 0.4
+      lfi: 0.9
+      lr: -0.7
+      indecis: 0.0
+  retailleau:
+    base: 10.0
+    affinity:
+      rn: 0.2
+      central: 0.0
+      gauche: -0.4
+      lfi: -0.7
+      lr: 0.85
+      indecis: 0.1
+  glucksmann:
+    base: 11.0
+    affinity:
+      rn: -0.5
+      central: 0.3
+      gauche: 0.75
+      lfi: 0.1
+      lr: -0.2
+      indecis: 0.2
+mass_model:
+  m_min: 0.3
+  m_max: 4.33938054468412
+  bias: 0.9169884600099005
+  weights:
+    crisis: 1.5
+    central_collapse: 1.2
+    volatility: 0.4
+    anti_extreme_pressure: 1.4
+    campaign_machine: 1.0
+    thematic_breadth: 0.8
+    media_performance: 1.1
+    coalition_building: 0.9
+capture:
+  villepin_scale: 5.249084677617855
+  volatility_softening: 0.8740092943961189
+central_collapse:
+  transfer_ratio: 0.55
+score_caps:
+  min: 0.5
+  max: 38.0
+second_round:
+  report_boost:
+    bardella:
+      base: 0.5
+      slope: 0.3
+    melenchon:
+      base: 0.25
+      slope: 0.15
+    philippe:
+      base: 0.05
+      slope: 0.05
+    retailleau:
+      base: 0.1
+      slope: 0.05
+    glucksmann:
+      base: 0.05
+      slope: 0.05
+    default:
+      base: 0.1
+      slope: 0.0
+  sigmoid_scale: 5.043476406107304
+  boost_to_score: 30.00275343864178
+constraints:
+  coalition_needs_machine:
+    threshold_machine: 0.5
+    cap_coalition_if_below: 0.6
+  thematic_needs_machine:
+    threshold_machine: 0.3
+    cap_thematic_if_below: 0.4
+  budget_internal:
+    params:
+    - campaign_machine
+    - thematic_breadth
+    - media_performance
+    - coalition_building
+    max_sum: 3.0
+  exogenous_params:
+  - crisis
+  - central_collapse
+  - volatility
+  - anti_extreme_pressure
+pipeline:
+  monte_carlo:
+    n_samples_full: 30000
+    n_samples_quick: 4000
+    n_mc_per_sample: 30
+    noise_std: 0.15
+  neural_network:
+    hidden: 192
+    n_layers: 3
+    dropout: 0.1
+    batch_size: 512
+    lr: 0.0015
+    weight_decay: 5.0e-05
+    max_epochs: 250
+    patience: 15
+    loss_weights:
+    - 1.0
+    - 5.0
+    - 20.0
+  cmaes:
+    sigma0: 0.25
+    popsize: 100
+    maxiter: 500
+    n_restarts: 20
+  clustering:
+    k: 6
+  llm:
+    enabled: true
+    provider: ollama
+    model: gemma4:31b-cloud
+    max_iterations: 4
+    params_per_iteration: 8
+    early_stop_patience: 2
+    max_total_subparams: 24
+    redundancy_threshold: 0.7
+    importance_to_weight: 0.06
+tier2_params: {}

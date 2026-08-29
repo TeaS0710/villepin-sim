@@ -1,0 +1,27 @@
+{
+  "best_p_victory_villepin": 0.877008564726413,
+  "best_score_1T_villepin": 27.307012954721504,
+  "best_opponent": "bardella",
+  "bases_at_optimum": {
+    "bardella": 15.000000000000076,
+    "philippe": 3.0000000000019633,
+    "melenchon": 4.000000000003516,
+    "retailleau": 21.999999999990074,
+    "glucksmann": 2.000000000002236
+  },
+  "params_at_optimum": {
+    "crisis": 0.9999999999999627,
+    "central_collapse": 6.918353339049743e-13,
+    "volatility": 0.999999999999956,
+    "anti_extreme_pressure": 0.9999999999994114,
+    "campaign_machine": 0.9999999999661373,
+    "thematic_breadth": 0.9999999999988395,
+    "media_performance": 0.9999999999994472,
+    "coalition_building": 0.9999999999947567
+  },
+  "n_restarts": 10,
+  "distinct_optima_p5_p95": [
+    0.8770085647091862,
+    0.8770085647252012
+  ]
+}
